@@ -17,23 +17,26 @@ let users = [];
 io.on('connection', socket => {
   console.log('User connected');
 
-  socket.on('new username', username => {
+  io.on('connect', socket => socket.emit('users_online', users.map(user => user.username)));
+
+  socket.on('new_username', username => {
     socket.username = username;
     users.push({username, id: socket.id});
-    io.emit('new username', username);
+    io.emit('new_username', username);
   })
   
-  socket.on('new message', (message) => {
-    io.emit('new message', {username: socket.username, message});
+  socket.on('new_message', (message) => {
+    io.emit('new_message', {username: socket.username, message});
   })
 
   socket.on('disconnect', () => {
     console.log(`User ${socket.username} disconnected`);
+    
     const indexOfDC = users.findIndex(user => user.id === socket.id);
     if (indexOfDC > -1) {
       users.splice(indexOfDC, 1);
       const usernames = users.map(user => user.username);
-      io.emit('user left', usernames);
+      io.emit('users_online', usernames);
     }; 
   });
 });
