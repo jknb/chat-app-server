@@ -15,9 +15,11 @@ const io = socketIO(server);
 let users = [];
 
 io.on('connection', socket => {
-  console.log('User connected');
-
-  io.on('connect', socket => socket.emit('users_online', users.map(user => user.username)));
+  const usernames = users.map(user => user.username);
+  console.log(`Socket connected. Socket ID: ${socket.id}, username: ${socket.username}`);
+  console.log(`Total users: ${usernames}`);
+  
+  socket.emit('users_online', usernames);
 
   socket.on('new_username', username => {
     socket.username = username;
